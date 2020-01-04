@@ -14,7 +14,9 @@ import numpy as np
 import PIL.Image
 import time
 import functools
+import sys
 
+import tensorflow_hub as hub
 
 def tensor_to_image(tensor):
   tensor = tensor*255
@@ -40,25 +42,21 @@ def load_img(path_to_img):
   img = img[tf.newaxis, :]
   return img
 
-def imshow(image, title=None):
-  if len(image.shape) > 3:
-    image = tf.squeeze(image, axis=0)
+def main(content_path, style_path):
+  #read images.
+  content_image = load_img(content_path)
+  style_image = load_img(style_path)
 
-  plt.imshow(image)
-  if title:
-    plt.title(title)
+  #load model
+  hub_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/1')
+  #style it!
+  stylized_image = hub_module(tf.constant(content_image), tf.constant(style_image))[0]
+  tensor_to_image(stylized_image).save('test.png')
 
 
-content_path = tf.keras.utils.get_file('YellowLabradorLooking_new.jpg', 'https://storage.googleapis.com/download.tensorflow.org/example_images/YellowLabradorLooking_new.jpg')
-style_path = tf.keras.utils.get_file('kandinsky5.jpg','https://storage.googleapis.com/download.tensorflow.org/example_images/Vassily_Kandinsky%2C_1913_-_Composition_7.jpg')
+if __name__ == '__main__':
+  # arg1 is content_path, arg2 is style_path
+  main(sys.argv[1], sys.argv[2])
+  
 
-content_image = load_img(content_path)
-style_image = load_img(style_path)
-
-# This tutorial demonstrates the original style-transfer algorithm. Which optimizes the image content to a particular style. Before getting into the details let's see how the [TensorFlow Hub](https://tensorflow.org/hub) module does:
-
-import tensorflow_hub as hub
-hub_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/1')
-stylized_image = hub_module(tf.constant(content_image), tf.constant(style_image))[0]
-tensor_to_image(stylized_image).save('test.png')
 
