@@ -42,6 +42,9 @@ def load_img(path_to_img):
   img = img[tf.newaxis, :]
   return img
 
+
+############################################################################################
+
 def main(content_path, style_path):
   #read images.
   content_image = load_img(content_path)
@@ -50,8 +53,9 @@ def main(content_path, style_path):
   #load model
   hub_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/1')
   #style it!
-  stylized_image = hub_module(tf.constant(content_image), tf.constant(style_image))[0]
-  tensor_to_image(stylized_image).save('test.png')
+  stylized_image = (hub_module(tf.constant(content_image), tf.constant(style_image))[0])
+  upscale = 4
+  tensor_to_image(tf.image.resize(stylized_image,tf.shape(stylized_image)[1:3]*upscale,'lanczos5', True, True) ).save('test.png')
 
 
 if __name__ == '__main__':
