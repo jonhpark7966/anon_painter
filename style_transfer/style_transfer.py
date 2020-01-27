@@ -45,22 +45,22 @@ def load_img(path_to_img):
 
 ############################################################################################
 
-def main(content_path, style_path):
+def main(content_path, style_path, save_path):
   #read images.
   content_image = load_img(content_path)
   style_image = load_img(style_path)
-
   #load model
   hub_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/1')
   #style it!
   stylized_image = (hub_module(tf.constant(content_image), tf.constant(style_image))[0])
   upscale = 4
-  tensor_to_image(tf.image.resize(stylized_image,tf.shape(stylized_image)[1:3]*upscale,'lanczos5', True, True) ).save('test.png')
+  tensor_to_image(tf.image.resize(stylized_image,tf.shape(stylized_image)[1:3]*upscale,'lanczos5', True, True) ).save(save_path)
+
 
 
 if __name__ == '__main__':
-  # arg1 is content_path, arg2 is style_path
-  main(sys.argv[1], sys.argv[2])
+  # arg1 is content_path, arg2 is style_path, arg3 is save_path
+  main(sys.argv[1], sys.argv[2], sys.argv[3])
   
 
 
